@@ -48,6 +48,19 @@ def download_comments(soup, filename, folder='comments/'):
             file.write('\n'.join(only_text))
 
 
+def find_genres(soup):
+    all_genres = soup.find('span', class_='d_book').find_all('a')
+    only_text = []
+    for genre in all_genres:
+        only_text.append(genre.text)
+    return ', '.join(only_text)
+
+
+def print_info(header, genres):
+    print('Заголовок:', header)
+    print('Жанры:', genres)
+    print()
+
 path = Path.cwd() / 'books'
 
 for i in range(1, 11):
@@ -66,10 +79,12 @@ for i in range(1, 11):
             title = title[:-1]
         while not author[0].isalnum():
             author = author[1:]
-        filename = f'{i}. {title} - {author}'
-        download_txt(f'https://tululu.org/txt.php?id={i}', filename)
+        filename = f'{title} - {author}'
+        download_txt(f'https://tululu.org/txt.php?id={i}', f'{i}. {filename}')
         download_image(img_url, img_name)
-        download_comments(soup, filename)
+        download_comments(soup, f'{i}. {filename}')
+        genres = find_genres(soup)
+        print_info(filename, genres)
     except requests.HTTPError:
         pass
 
