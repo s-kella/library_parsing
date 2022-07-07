@@ -23,7 +23,6 @@ def download_txt(url, filename, folder='books/'):
     filepath = f'{folder}{filename}.txt'
     with open(filepath, 'w') as file:
         file.write(response.text)
-    return filepath
 
 
 def download_image(url, filename, folder='covers/'):
@@ -34,7 +33,19 @@ def download_image(url, filename, folder='covers/'):
     filepath = f'{folder}{filename}'
     with open(filepath, 'wb') as file:
         file.write(response.content)
-    return filepath
+
+
+def download_comments(soup, filename, folder='comments/'):
+    os.makedirs(folder, exist_ok=True)
+    filename = sanitize_filename(filename)
+    filepath = f'{folder}{filename}.txt'
+    all_comments = soup.find_all('div', class_='texts')
+    only_text = []
+    for comment in all_comments:
+        only_text.append(comment.text.split(')')[-1])
+    if only_text:
+        with open(filepath, 'w') as file:
+            file.write('\n'.join(only_text))
 
 
 path = Path.cwd() / 'books'
@@ -55,9 +66,10 @@ for i in range(1, 11):
             title = title[:-1]
         while not author[0].isalnum():
             author = author[1:]
-        filename = f'{i}.{title} - {author}'
+        filename = f'{i}. {title} - {author}'
         download_txt(f'https://tululu.org/txt.php?id={i}', filename)
         download_image(img_url, img_name)
+        download_comments(soup, filename)
     except requests.HTTPError:
         pass
 
