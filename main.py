@@ -35,31 +35,51 @@ def download_image(url, filename, folder='covers/'):
         file.write(response.content)
 
 
-def download_comments(soup, filename, folder='comments/'):
+def download_comments(comments, filename, folder='comments/'):
     os.makedirs(folder, exist_ok=True)
     filename = sanitize_filename(filename)
     filepath = f'{folder}{filename}.txt'
-    all_comments = soup.find_all('div', class_='texts')
-    only_text = []
-    for comment in all_comments:
-        only_text.append(comment.text.split(')')[-1])
-    if only_text:
+    if comments:
         with open(filepath, 'w') as file:
-            file.write('\n'.join(only_text))
-
-
-def find_genres(soup):
-    all_genres = soup.find('span', class_='d_book').find_all('a')
-    only_text = []
-    for genre in all_genres:
-        only_text.append(genre.text)
-    return ', '.join(only_text)
+            file.write('\n'.join(comments))
 
 
 def print_info(header, genres):
     print('Заголовок:', header)
     print('Жанры:', genres)
     print()
+
+
+def parse_book_page(soup):
+    book_info = {}
+    all_genres = soup.find('span', class_='d_book').find_all('a')
+    only_text_genres = []
+    for genre in all_genres:
+        only_text_genres.append(genre.text)
+    book_info['genres'] = ', '.join(only_text_genres)
+
+    all_comments = soup.find_all('div', class_='texts')
+    only_text_comments = []
+    for comment in all_comments:
+        only_text_comments.append(comment.text.split(')')[-1])
+    book_info['comments'] = only_text_comments
+
+    img_url = soup.find('div', class_='bookimage').find('img')['src']
+    img_name = img_url.split('/')[-1]
+    img_url = urljoin('https://tululu.org/', img_url)
+    book_info['img name'] = img_name
+    book_info['img url'] = img_url
+
+    header = soup.find('td', class_='ow_px_td').find('h1').text
+    title, author = header.split('::')
+    while not title[-1].isalnum():
+        title = title[:-1]
+    while not author[0].isalnum():
+        author = author[1:]
+    book_info['title'] = title
+    book_info['author'] = author
+    return book_info
+
 
 path = Path.cwd() / 'books'
 
@@ -70,20 +90,12 @@ for i in range(1, 11):
     try:
         check_for_redirect(response)
         soup = BeautifulSoup(response.text, 'lxml')
-        header = soup.find('td', class_='ow_px_td').find('h1').text
-        title, author = header.split('::')
-        img_url = soup.find('div', class_='bookimage').find('img')['src']
-        img_name = img_url.split('/')[-1]
-        img_url = urljoin('https://tululu.org/', img_url)
-        while not title[-1].isalnum():
-            title = title[:-1]
-        while not author[0].isalnum():
-            author = author[1:]
+        book_info = parse_book_page(soup)
+        title, author, img_url, img_name, genres, comments = book_info['title'], book_info['author'], book_info['img url'], book_info['img name'], book_info['genres'], book_info['comments']
         filename = f'{title} - {author}'
         download_txt(f'https://tululu.org/txt.php?id={i}', f'{i}. {filename}')
         download_image(img_url, img_name)
-        download_comments(soup, f'{i}. {filename}')
-        genres = find_genres(soup)
+        download_comments(comments, f'{i}. {filename}')
         print_info(filename, genres)
     except requests.HTTPError:
         pass
