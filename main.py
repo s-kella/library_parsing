@@ -1,7 +1,6 @@
 import os
 import requests
 import argparse
-from pathlib import Path
 from urllib.parse import urlparse, unquote
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
@@ -82,26 +81,29 @@ def parse_book_page(soup):
     return book_info
 
 
-path = Path.cwd() / 'books'
-parser = argparse.ArgumentParser(description='Download books from tululu.org')
-parser.add_argument('-s', '--start_id', help='id of the first book you want to download', type=int, default=1)
-parser.add_argument('-e', '--end_id', help='id of the first book you want to download', type=int, default=11)
-args = parser.parse_args()
-for i in range(args.start_id, args.end_id):
-    name_url = f'https://tululu.org/b{i}/'
-    response = requests.get(name_url)
-    response.raise_for_status()
-    try:
-        check_for_redirect(response)
-        soup = BeautifulSoup(response.text, 'lxml')
-        book_info = parse_book_page(soup)
-        title, author, img_url, img_name, genres, comments = book_info['title'], book_info['author'], book_info['img url'], book_info['img name'], book_info['genres'], book_info['comments']
-        filename = f'{title} - {author}'
-        download_txt(f'https://tululu.org/txt.php?id={i}', f'{i}. {filename}')
-        download_image(img_url, img_name)
-        download_comments(comments, f'{i}. {filename}')
-        print_info(filename, genres)
-    except requests.HTTPError:
-        pass
+def main():
+    parser = argparse.ArgumentParser(description='Download books from tululu.org')
+    parser.add_argument('-s', '--start_id', help='id of the first book you want to download', type=int, default=1)
+    parser.add_argument('-e', '--end_id', help='id of the first book you want to download', type=int, default=11)
+    args = parser.parse_args()
+    for i in range(args.start_id, args.end_id):
+        name_url = f'https://tululu.org/b{i}/'
+        response = requests.get(name_url)
+        response.raise_for_status()
+        try:
+            check_for_redirect(response)
+            soup = BeautifulSoup(response.text, 'lxml')
+            book_info = parse_book_page(soup)
+            title, author, img_url, img_name, genres, comments = book_info['title'], book_info['author'], book_info['img url'], book_info['img name'], book_info['genres'], book_info['comments']
+            filename = f'{title} - {author}'
+            download_txt(f'https://tululu.org/txt.php?id={i}', f'{i}. {filename}')
+            download_image(img_url, img_name)
+            download_comments(comments, f'{i}. {filename}')
+            print_info(filename, genres)
+        except requests.HTTPError:
+            pass
 
+
+if __name__ == '__main__':
+    main()
 
