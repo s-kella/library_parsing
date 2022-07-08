@@ -1,11 +1,10 @@
-# -*- coding: cp1251 -*-
 import requests
+import argparse
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 from urllib.parse import urljoin
-import lxml
 import os
 
 
@@ -45,8 +44,8 @@ def download_comments(comments, filename, folder='comments/'):
 
 
 def print_info(header, genres):
-    print('«‡„ÓÎÓ‚ÓÍ:', header)
-    print('∆‡Ì˚:', genres)
+    print('–ó–∞–≥–æ–ª–æ–≤–æ–∫:', header)
+    print('–ñ–∞–Ω—Ä—ã:', genres)
     print()
 
 
@@ -65,7 +64,9 @@ def parse_book_page(soup):
     book_info['comments'] = only_text_comments
 
     img_url = soup.find('div', class_='bookimage').find('img')['src']
-    img_name = img_url.split('/')[-1]
+    img_name = urlparse(img_url).path
+    img_name = os.path.basename(img_name)
+    img_name = unquote(img_name)
     img_url = urljoin('https://tululu.org/', img_url)
     book_info['img name'] = img_name
     book_info['img url'] = img_url
@@ -82,8 +83,11 @@ def parse_book_page(soup):
 
 
 path = Path.cwd() / 'books'
-
-for i in range(1, 11):
+parser = argparse.ArgumentParser(description='Download books from tululu.org')
+parser.add_argument('-s', '--start_id', help='id of the first book you want to download', type=int, default=1)
+parser.add_argument('-e', '--end_id', help='id of the first book you want to download', type=int, default=11)
+args = parser.parse_args()
+for i in range(args.start_id, args.end_id):
     name_url = f'https://tululu.org/b{i}/'
     response = requests.get(name_url)
     response.raise_for_status()
