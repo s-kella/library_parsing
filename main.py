@@ -1,3 +1,4 @@
+import os
 import requests
 import argparse
 from pathlib import Path
@@ -5,7 +6,6 @@ from urllib.parse import urlparse, unquote
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 from urllib.parse import urljoin
-import os
 
 
 def check_for_redirect(response):
