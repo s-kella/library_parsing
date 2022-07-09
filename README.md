@@ -1,6 +1,6 @@
 # library_parsing
 
-Download books from the online-library [tululu.org](https://tululu.org/)
+Download books from the online-library [tululu.org](https://tululu.org/).
 
 ### How to install:
 
