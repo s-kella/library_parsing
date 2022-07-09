@@ -49,26 +49,26 @@ def print_info(header, genres):
 
 
 def parse_book_page(soup):
-    book_info = {}
+    book = {}
     all_genres = soup.find('span', class_='d_book').find_all('a')
     genres_only_text = []
     for genre in all_genres:
         genres_only_text.append(genre.text)
-    book_info['genres'] = ', '.join(genres_only_text)
+    book['genres'] = ', '.join(genres_only_text)
 
     all_comments = soup.find_all('div', class_='texts')
     comments_only_text = []
     for comment in all_comments:
         comments_only_text.append(comment.text.split(')')[-1])
-    book_info['comments'] = comments_only_text
+    book['comments'] = comments_only_text
 
     img_url = soup.find('div', class_='bookimage').find('img')['src']
     img_name = urlparse(img_url).path
     img_name = os.path.basename(img_name)
     img_name = unquote(img_name)
     img_url = urljoin('https://tululu.org/', img_url)
-    book_info['img name'] = img_name
-    book_info['img url'] = img_url
+    book['img name'] = img_name
+    book['img url'] = img_url
 
     header = soup.find('td', class_='ow_px_td').find('h1').text
     title, author = header.split('::')
@@ -76,9 +76,9 @@ def parse_book_page(soup):
         title = title[:-1]
     while not author[0].isalnum():
         author = author[1:]
-    book_info['title'] = title
-    book_info['author'] = author
-    return book_info
+    book['title'] = title
+    book['author'] = author
+    return book
 
 
 def main():
@@ -93,12 +93,12 @@ def main():
         try:
             check_for_redirect(response)
             soup = BeautifulSoup(response.text, 'lxml')
-            book_info = parse_book_page(soup)
-            filename = f'{book_info["title"]} - {book_info["author"]}'
+            book = parse_book_page(soup)
+            filename = f'{book["title"]} - {book["author"]}'
             download_txt(f'https://tululu.org/txt.php?id={book_id}', f'{book_id}. {filename}')
-            download_image(book_info['img url'], book_info['img name'])
-            download_comments(book_info['comments'], f'{book_id}. {filename}')
-            print_info(filename, book_info['genres'])
+            download_image(book['img url'], book['img name'])
+            download_comments(book['comments'], f'{book_id}. {filename}')
+            print_info(filename, book['genres'])
         except requests.HTTPError:
             pass
 
