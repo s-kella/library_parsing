@@ -49,12 +49,11 @@ def print_info(header, genres):
 
 
 def parse_book_page(soup):
-    book = {}
     all_genres = soup.find('span', class_='d_book').find_all('a')
     genres_only_text = []
     for genre in all_genres:
         genres_only_text.append(genre.text)
-    book['genres'] = ', '.join(genres_only_text)
+    book = {'genres': ', '.join(genres_only_text)}
 
     all_comments = soup.find_all('div', class_='texts')
     comments_only_text = []
