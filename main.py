@@ -86,9 +86,9 @@ def main():
     parser.add_argument('-s', '--start_id', help='id of the first book you want to download', type=int, default=1)
     parser.add_argument('-e', '--end_id', help='id of the last book you want to download', type=int, default=11)
     args = parser.parse_args()
-    for i in range(args.start_id, args.end_id):
-        name_url = f'https://tululu.org/b{i}/'
-        response = requests.get(name_url)
+    for book_id in range(args.start_id, args.end_id):
+        book_url = f'https://tululu.org/b{book_id}/'
+        response = requests.get(book_url)
         response.raise_for_status()
         try:
             check_for_redirect(response)
@@ -96,9 +96,9 @@ def main():
             book_info = parse_book_page(soup)
             title, author, img_url, img_name, genres, comments = book_info['title'], book_info['author'], book_info['img url'], book_info['img name'], book_info['genres'], book_info['comments']
             filename = f'{title} - {author}'
-            download_txt(f'https://tululu.org/txt.php?id={i}', f'{i}. {filename}')
+            download_txt(f'https://tululu.org/txt.php?id={book_id}', f'{book_id}. {filename}')
             download_image(img_url, img_name)
-            download_comments(comments, f'{i}. {filename}')
+            download_comments(comments, f'{book_id}. {filename}')
             print_info(filename, genres)
         except requests.HTTPError:
             pass
