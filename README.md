@@ -12,8 +12,8 @@ pip install -r requirements.txt
 
 ### Options:
 
--s --start_id   id of the first book you want to download. <br />
--e --end_id    id of the first book you want to download.
+-s --start_id (id of the first book you want to download). <br />
+-e --end_id (id of the last book you want to download).
 
 ### Example of running:
 
