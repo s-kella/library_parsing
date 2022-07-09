@@ -84,7 +84,7 @@ def parse_book_page(soup):
 def main():
     parser = argparse.ArgumentParser(description='Download books from tululu.org')
     parser.add_argument('-s', '--start_id', help='id of the first book you want to download', type=int, default=1)
-    parser.add_argument('-e', '--end_id', help='id of the first book you want to download', type=int, default=11)
+    parser.add_argument('-e', '--end_id', help='id of the last book you want to download', type=int, default=11)
     args = parser.parse_args()
     for i in range(args.start_id, args.end_id):
         name_url = f'https://tululu.org/b{i}/'
