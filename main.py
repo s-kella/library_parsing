@@ -94,12 +94,11 @@ def main():
             check_for_redirect(response)
             soup = BeautifulSoup(response.text, 'lxml')
             book_info = parse_book_page(soup)
-            title, author, img_url, img_name, genres, comments = book_info['title'], book_info['author'], book_info['img url'], book_info['img name'], book_info['genres'], book_info['comments']
-            filename = f'{title} - {author}'
+            filename = f'{book_info["title"]} - {book_info["author"]}'
             download_txt(f'https://tululu.org/txt.php?id={book_id}', f'{book_id}. {filename}')
-            download_image(img_url, img_name)
-            download_comments(comments, f'{book_id}. {filename}')
-            print_info(filename, genres)
+            download_image(book_info['img url'], book_info['img name'])
+            download_comments(book_info['comments'], f'{book_id}. {filename}')
+            print_info(filename, book_info['genres'])
         except requests.HTTPError:
             pass
 
