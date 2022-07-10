@@ -33,7 +33,7 @@ def download_image(url, filename, folder='covers/'):
         file.write(response.content)
 
 
-def download_comments(comments, filename, folder='comments/'):
+def save_comments(comments, filename, folder='comments/'):
     os.makedirs(folder, exist_ok=True)
     filename = sanitize_filename(filename)
     filepath = f'{folder}{filename}.txt'
@@ -92,7 +92,7 @@ def main():
             filename = f'{book["title"]} - {book["author"]}'
             download_txt(f'https://tululu.org/txt.php?id={book_id}', f'{book_id}. {filename}')
             download_image(book['img url'], book['img name'])
-            download_comments(book['comments'], f'{book_id}. {filename}')
+            save_comments(book['comments'], f'{book_id}. {filename}')
             print_info(filename, book['genres'])
         except requests.HTTPError:
             pass
