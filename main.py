@@ -50,15 +50,11 @@ def print_info(header, genres):
 
 def parse_book_page(soup, book_url):
     all_genres = soup.find('span', class_='d_book').find_all('a')
-    genres_only_text = []
-    for genre in all_genres:
-        genres_only_text.append(genre.text)
+    genres_only_text = [genre.text for genre in all_genres]
     book = {'genres': ', '.join(genres_only_text)}
 
     all_comments = soup.find_all('div', class_='texts')
-    comments_only_text = []
-    for comment in all_comments:
-        comments_only_text.append(comment.text.split(')')[-1])
+    comments_only_text = [comment.text.split(')')[-1] for comment in all_comments]
     book['comments'] = comments_only_text
 
     img_url = soup.find('div', class_='bookimage').find('img')['src']
