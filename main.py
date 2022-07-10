@@ -12,10 +12,10 @@ def check_for_redirect(response):
         raise requests.HTTPError
 
 
-def download_txt(url, filename, folder='books'):
+def download_txt(url, params, filename, folder='books'):
     os.makedirs(folder, exist_ok=True)
     filename = sanitize_filename(filename)
-    response = requests.get(url)
+    response = requests.get(url, params=params)
     response.raise_for_status()
     check_for_redirect(response)
     filepath = os.path.join(folder, f'{filename}.txt')
@@ -90,7 +90,8 @@ def main():
             soup = BeautifulSoup(response.text, 'lxml')
             book = parse_book_page(soup, book_url)
             filename = f'{book["title"]} - {book["author"]}'
-            download_txt(f'https://tululu.org/txt.php?id={book_id}', f'{book_id}. {filename}')
+            params = {'id': book_id}
+            download_txt(f'https://tululu.org/txt.php', params, f'{book_id}. {filename}')
             download_image(book['img url'], book['img name'])
             save_comments(book['comments'], f'{book_id}. {filename}')
             print_info(filename, book['genres'])
