@@ -12,31 +12,31 @@ def check_for_redirect(response):
         raise requests.HTTPError
 
 
-def download_txt(url, filename, folder='books/'):
+def download_txt(url, filename, folder='books'):
     os.makedirs(folder, exist_ok=True)
     filename = sanitize_filename(filename)
     response = requests.get(url)
     response.raise_for_status()
     check_for_redirect(response)
-    filepath = f'{folder}{filename}.txt'
+    filepath = os.path.join(folder, f'{filename}.txt')
     with open(filepath, 'w') as file:
         file.write(response.text)
 
 
-def download_image(url, filename, folder='covers/'):
+def download_image(url, filename, folder='covers'):
     os.makedirs(folder, exist_ok=True)
     response = requests.get(url)
     response.raise_for_status()
     check_for_redirect(response)
-    filepath = f'{folder}{filename}'
+    filepath = os.path.join(folder, f'{filename}')
     with open(filepath, 'wb') as file:
         file.write(response.content)
 
 
-def save_comments(comments, filename, folder='comments/'):
+def save_comments(comments, filename, folder='comments'):
     os.makedirs(folder, exist_ok=True)
     filename = sanitize_filename(filename)
-    filepath = f'{folder}{filename}.txt'
+    filepath = os.path.join(folder, f'{filename}.txt')
     if comments:
         with open(filepath, 'w') as file:
             file.write('\n'.join(comments))
@@ -78,7 +78,7 @@ def parse_book_page(soup, book_url):
 
 def main():
     parser = argparse.ArgumentParser(description='Download books from tululu.org')
-    parser.add_argument('-s', '--start_id', help='id of the first book you want to download', type=int, default=1)
+    parser.add_argument('-s', '--start_id', help='id of the first book you want to download', type=int, default=5)
     parser.add_argument('-e', '--end_id', help='id of the last book you want to download', type=int, default=11)
     args = parser.parse_args()
     for book_id in range(args.start_id, args.end_id):
