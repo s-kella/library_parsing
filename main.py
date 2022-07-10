@@ -48,7 +48,7 @@ def print_info(header, genres):
     print()
 
 
-def parse_book_page(soup):
+def parse_book_page(soup, book_url):
     all_genres = soup.find('span', class_='d_book').find_all('a')
     genres_only_text = []
     for genre in all_genres:
@@ -65,7 +65,7 @@ def parse_book_page(soup):
     img_name = urlparse(img_url).path
     img_name = os.path.basename(img_name)
     img_name = unquote(img_name)
-    img_url = urljoin('https://tululu.org/', img_url)
+    img_url = urljoin(book_url, img_url)
     book['img name'] = img_name
     book['img url'] = img_url
 
@@ -92,7 +92,7 @@ def main():
         try:
             check_for_redirect(response)
             soup = BeautifulSoup(response.text, 'lxml')
-            book = parse_book_page(soup)
+            book = parse_book_page(soup, book_url)
             filename = f'{book["title"]} - {book["author"]}'
             download_txt(f'https://tululu.org/txt.php?id={book_id}', f'{book_id}. {filename}')
             download_image(book['img url'], book['img name'])
