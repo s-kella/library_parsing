@@ -94,6 +94,7 @@ def main():
             save_comments(book['comments'], f'{book_id}. {filename}')
             print_info(filename, book['genres'])
         except requests.HTTPError:
+            print(f'Invalid URL for book {book_id}\n')
             pass
 
 
