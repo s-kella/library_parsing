@@ -67,10 +67,8 @@ def parse_book_page(soup, book_url):
 
     header = soup.find('td', class_='ow_px_td').find('h1').text
     title, author = header.split('::')
-    while not title[-1].isalnum():
-        title = title[:-1]
-    while not author[0].isalnum():
-        author = author[1:]
+    title = title.replace('/xa0', '').strip()
+    author = author.replace('/xa0', '').strip()
     book['title'] = title
     book['author'] = author
     return book
@@ -78,14 +76,14 @@ def parse_book_page(soup, book_url):
 
 def main():
     parser = argparse.ArgumentParser(description='Download books from tululu.org')
-    parser.add_argument('-s', '--start_id', help='id of the first book you want to download', type=int, default=5)
+    parser.add_argument('-s', '--start_id', help='id of the first book you want to download', type=int, default=1)
     parser.add_argument('-e', '--end_id', help='id of the last book you want to download', type=int, default=11)
     args = parser.parse_args()
     for book_id in range(args.start_id, args.end_id):
         book_url = f'https://tululu.org/b{book_id}/'
-        response = requests.get(book_url)
-        response.raise_for_status()
         try:
+            response = requests.get(book_url)
+            response.raise_for_status()
             check_for_redirect(response)
             soup = BeautifulSoup(response.text, 'lxml')
             book = parse_book_page(soup, book_url)
