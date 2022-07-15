@@ -1,6 +1,7 @@
 import os
 import requests
 import argparse
+import time
 from urllib.parse import urlparse, unquote
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
@@ -81,21 +82,27 @@ def main():
     args = parser.parse_args()
     for book_id in range(args.start_id, args.end_id):
         book_url = f'https://tululu.org/b{book_id}/'
-        try:
-            response = requests.get(book_url)
-            response.raise_for_status()
-            check_for_redirect(response)
-            soup = BeautifulSoup(response.text, 'lxml')
-            book = parse_book_page(soup, book_url)
-            filename = f'{book["title"]} - {book["author"]}'
-            params = {'id': book_id}
-            download_txt(f'https://tululu.org/txt.php', params, f'{book_id}. {filename}')
-            download_image(book['img url'], book['img name'])
-            save_comments(book['comments'], f'{book_id}. {filename}')
-            print_info(filename, book['genres'])
-        except requests.HTTPError:
-            print(f'Invalid URL for book {book_id}\n')
-            pass
+        while True:
+            try:
+                response = requests.get(book_url)
+                response.raise_for_status()
+                check_for_redirect(response)
+                soup = BeautifulSoup(response.text, 'lxml')
+                book = parse_book_page(soup, book_url)
+                filename = f'{book["title"]} - {book["author"]}'
+                params = {'id': book_id}
+                download_txt(f'https://tululu.org/txt.php', params, f'{book_id}. {filename}')
+                download_image(book['img url'], book['img name'])
+                save_comments(book['comments'], f'{book_id}. {filename}')
+                print_info(filename, book['genres'])
+                break
+            except requests.HTTPError:
+                print(f'Invalid URL for book {book_id}\n')
+                break
+            except requests.exceptions.ConnectionError:
+                print('No internet connection', book_id)
+                time.sleep(5)
+                continue
 
 
 if __name__ == '__main__':
