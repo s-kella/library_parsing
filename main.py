@@ -29,7 +29,7 @@ def download_image(url, filename, folder='covers'):
     response = requests.get(url)
     response.raise_for_status()
     check_for_redirect(response)
-    filepath = os.path.join(folder, f'{filename}')
+    filepath = os.path.join(folder, filename)
     with open(filepath, 'wb') as file:
         file.write(response.content)
 
