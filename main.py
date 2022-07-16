@@ -52,26 +52,28 @@ def print_info(header, genres):
 def parse_book_page(soup, book_url):
     all_genres = soup.find('span', class_='d_book').find_all('a')
     genres_only_text = [genre.text for genre in all_genres]
-    book = {'genres': ', '.join(genres_only_text)}
 
     all_comments = soup.find_all('div', class_='texts')
     comments_only_text = [comment.text.split(')')[-1] for comment in all_comments]
-    book['comments'] = comments_only_text
 
     img_url = soup.find('div', class_='bookimage').find('img')['src']
     img_name = urlparse(img_url).path
     img_name = os.path.basename(img_name)
     img_name = unquote(img_name)
     img_url = urljoin(book_url, img_url)
-    book['img name'] = img_name
-    book['img url'] = img_url
 
     header = soup.find('td', class_='ow_px_td').find('h1').text
     title, author = header.split('::')
     title = title.replace('/xa0', '').strip()
     author = author.replace('/xa0', '').strip()
-    book['title'] = title
-    book['author'] = author
+
+    book = {'genres': ', '.join(genres_only_text),
+            'comments': comments_only_text,
+            'img name': img_name,
+            'img url': img_url,
+            'title': title,
+            'author': author
+            }
     return book
 
 
