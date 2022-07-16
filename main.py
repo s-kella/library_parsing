@@ -38,9 +38,8 @@ def save_comments(comments, filename, folder='comments'):
     os.makedirs(folder, exist_ok=True)
     filename = sanitize_filename(filename)
     filepath = os.path.join(folder, f'{filename}.txt')
-    if comments:
-        with open(filepath, 'w') as file:
-            file.write('\n'.join(comments))
+    with open(filepath, 'w') as file:
+        file.write('\n'.join(comments))
 
 
 def print_info(header, genres):
@@ -95,7 +94,8 @@ def main():
                 params = {'id': book_id}
                 download_txt(f'https://tululu.org/txt.php', params, f'{book_id}. {filename}')
                 download_image(book['img url'], book['img name'])
-                save_comments(book['comments'], f'{book_id}. {filename}')
+                if book['comments']:
+                    save_comments(book['comments'], f'{book_id}. {filename}')
                 print_info(filename, book['genres'])
                 break
             except requests.HTTPError:
