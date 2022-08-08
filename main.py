@@ -38,7 +38,6 @@ def download_image(url, filename, path):
     full_path = os.path.join(path, folder)
     os.makedirs(full_path, exist_ok=True)
     filepath = os.path.join(full_path, filename)
-    print(filepath)
     with open(filepath, 'wb') as file:
         file.write(response.content)
 
