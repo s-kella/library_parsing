@@ -1,6 +1,6 @@
 # library_parsing
 
-Download books from the online-library [tululu.org](https://tululu.org/).
+Download books from the online-library [tululu.org](https://tululu.org/). Download text of the book, cover and create file with descriptions of the all downloaded books (title, author, img url, genres, comments from tululu.org)
 
 ### How to install:
 
@@ -12,14 +12,11 @@ pip install -r requirements.txt
 
 ### Options:
 
--s --start_id (id of the first book you want to download). <br />
--e --end_id (id of the last book you want to download).
-
-### Example of running:
-
-```
-python main.py --start_id 20 --end_id 30
-```
+-s --start_page (first page you want to download). <br />
+-e --end_page (last page you want to download). <br />
+-d --dest_folder (the path to the directory with the parsing results: pictures, books, JSON). <br />
+-si --skip_imgs (do not download images). <br />
+-st --skip_txt (do not download books).
 
 ### Project Goals:
 
