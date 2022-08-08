@@ -92,6 +92,7 @@ def main():
     parser.add_argument('-s', '--start_page', help='id of the first book you want to download.', type=int, default=1)
     parser.add_argument('-e', '--end_page', help='id of the last book you want to download.', type=int, default=1)
     parser.add_argument('-d', '--dest_folder', help='the path to the directory with the parsing results: pictures, books, JSON.')
+    parser.add_argument('-si', '--skip_imgs', help='do not download images', action='store_true')
     args = parser.parse_args()
     book_links = parse_tululu_category.parse_pages(start_page=args.start_page, end_page=args.end_page)
     books = []
@@ -107,7 +108,8 @@ def main():
                 filename = f'{book["title"]} - {book["author"]}'
                 params = {'id': book_id}
                 download_txt(f'https://tululu.org/txt.php', params, f'{book_id}. {filename}', args.dest_folder if args.dest_folder else os.getcwd())
-                download_image(book['img url'], book['img name'], args.dest_folder if args.dest_folder else os.getcwd())
+                if not args.skip_imgs:
+                    download_image(book['img url'], book['img name'], args.dest_folder if args.dest_folder else os.getcwd())
                 books.append(book)
                 print_info(filename, book['genres'])
                 break
