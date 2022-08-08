@@ -51,19 +51,23 @@ def print_info(header, genres):
 
 
 def parse_book_page(soup, book_url):
-    all_genres = soup.find('span', class_='d_book').find_all('a')
+    genres_selector = 'span.d_book a'
+    all_genres = soup.select(genres_selector)
     genres_only_text = [genre.text for genre in all_genres]
 
-    all_comments = soup.find_all('div', class_='texts')
+    comments_selector = 'div.texts'
+    all_comments = soup.select(comments_selector)
     comments_only_text = [comment.text.split(')')[-1] for comment in all_comments]
 
-    img_url = soup.find('div', class_='bookimage').find('img')['src']
+    img_selector = 'div.bookimage img'
+    img_url = soup.select_one(img_selector)['src']
     img_name = urlparse(img_url).path
     img_name = os.path.basename(img_name)
     img_name = unquote(img_name)
     img_url = urljoin(book_url, img_url)
 
-    header = soup.find('td', class_='ow_px_td').find('h1').text
+    header_selector = 'td.ow_px_td h1'
+    header = soup.select_one(header_selector).text
     title, author = header.split('::')
     title = title.replace('/xa0', '').strip()
     author = author.replace('/xa0', '').strip()
@@ -86,7 +90,7 @@ def add_info_to_json(books):
 def main():
     parser = argparse.ArgumentParser(description='Download books from tululu.org')
     parser.add_argument('-s', '--start_page', help='id of the first book you want to download', type=int, default=1)
-    parser.add_argument('-e', '--end_page', help='id of the last book you want to download', type=int, default=5)
+    parser.add_argument('-e', '--end_page', help='id of the last book you want to download', type=int, default=1)
     args = parser.parse_args()
     book_links = parse_tululu_category.parse_pages(start_page=args.start_page, end_page=args.end_page)
     books = []
