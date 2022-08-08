@@ -12,11 +12,11 @@ pip install -r requirements.txt
 
 ### Options:
 
-`-s` `--start_page` (first page you want to download). <br />
-`-e` `--end_page` (last page you want to download). <br />
-`-d` `--dest_folder` (the path to the directory with the parsing results: pictures, books, JSON). <br />
-`-si` `--skip_imgs` (do not download images). <br />
-`-st` `--skip_txt` (do not download books).
+`-s` `--start_page` - first page you want to download. <br />
+`-e` `--end_page` - last page you want to download. <br />
+`-d` `--dest_folder` - the path to the directory with the parsing results: pictures, books, JSON. <br />
+`-si` `--skip_imgs` - do not download images. <br />
+`-st` `--skip_txt` - do not download books.
 
 ### Project Goals:
 
