@@ -1,6 +1,6 @@
 # library_parsing
 
-Download books from the online-library [tululu.org](https://tululu.org/). Download text of the book, cover and create file with descriptions of the all downloaded books (title, author, img url, genres, comments from tululu.org)
+Download books from the online-library [tululu.org](https://tululu.org/). Download the text of the book, and cover, and create a file with descriptions of the all downloaded books (title, author, genres, comments from tululu.org)
 
 ### How to install:
 
