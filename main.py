@@ -3,7 +3,6 @@ import json
 import requests
 import argparse
 import time
-import parse_tululu_category
 from urllib.parse import urlparse, unquote
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
@@ -13,6 +12,27 @@ from urllib.parse import urljoin
 def check_for_redirect(response):
     if response.url == 'https://tululu.org/':
         raise requests.HTTPError
+
+
+def parse_pages(*, end_page, start_page=1):
+    links = []
+    for page_number in range(start_page, end_page+1):
+        while True:
+            try:
+                url = f'https://tululu.org/l55/{page_number}/'
+                response = requests.get(url)
+                response.raise_for_status()
+                soup = BeautifulSoup(response.text, 'lxml')
+                books = soup.find_all('table', class_='d_book')
+                for book in books:
+                    link = urljoin(url, book.find('a')['href'])
+                    links.append(link)
+                break
+            except requests.exceptions.ConnectionError:
+                print('No internet connection')
+                time.sleep(5)
+                continue
+    return links
 
 
 def download_txt(url, params, filename, path):
@@ -88,13 +108,13 @@ def add_info_to_json(books, path):
 
 def main():
     parser = argparse.ArgumentParser(description='Download books from tululu.org')
-    parser.add_argument('-s', '--start_page', help='id of the first book you want to download.', type=int, default=1)
-    parser.add_argument('-e', '--end_page', help='id of the last book you want to download.', type=int, default=1)
+    parser.add_argument('-s', '--start_page', help='first page you want to download.', type=int, default=1)
+    parser.add_argument('-e', '--end_page', help='last page you want to download.', type=int, default=1)
     parser.add_argument('-d', '--dest_folder', help='the path to the directory with the parsing results: pictures, books, JSON.')
     parser.add_argument('-si', '--skip_imgs', help='do not download images', action='store_true')
     parser.add_argument('-st', '--skip_txt', help='do not download books', action='store_true')
     args = parser.parse_args()
-    book_links = parse_tululu_category.parse_pages(start_page=args.start_page, end_page=args.end_page)
+    book_links = parse_pages(start_page=args.start_page, end_page=args.end_page)
     books = []
     for link in book_links:
         book_id = link.split('/b')[-1].strip('/')
