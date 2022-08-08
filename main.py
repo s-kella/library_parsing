@@ -1,7 +1,9 @@
 import os
+import json
 import requests
 import argparse
 import time
+import parse_tululu_category
 from urllib.parse import urlparse, unquote
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
@@ -66,47 +68,55 @@ def parse_book_page(soup, book_url):
     title = title.replace('/xa0', '').strip()
     author = author.replace('/xa0', '').strip()
 
-    book = {'genres': ', '.join(genres_only_text),
-            'comments': comments_only_text,
-            'img name': img_name,
+    book = {'title': title,
+            'author': author,
             'img url': img_url,
-            'title': title,
-            'author': author
+            'genres': ', '.join(genres_only_text),
+            'comments': comments_only_text,
+            'img name': img_name
             }
     return book
 
 
+def add_info_to_json(books):
+    with open('books.json', 'w', encoding='utf8') as file:
+        json.dump(books, file, sort_keys=True, indent=4, ensure_ascii=False)
+
+
 def main():
     parser = argparse.ArgumentParser(description='Download books from tululu.org')
-    parser.add_argument('-s', '--start_id', help='id of the first book you want to download', type=int, default=1)
-    parser.add_argument('-e', '--end_id', help='id of the last book you want to download', type=int, default=11)
+    parser.add_argument('-s', '--start_page', help='id of the first book you want to download', type=int, default=1)
+    parser.add_argument('-e', '--end_page', help='id of the last book you want to download', type=int, default=5)
     args = parser.parse_args()
-    for book_id in range(args.start_id, args.end_id):
-        book_url = f'https://tululu.org/b{book_id}/'
+    book_links = parse_tululu_category.parse_pages(start_page=args.start_page, end_page=args.end_page)
+    books = []
+    for link in book_links:
+        book_id = link.split('/b')[-1].strip('/')
         while True:
             try:
-                response = requests.get(book_url)
+                response = requests.get(link)
                 response.raise_for_status()
                 check_for_redirect(response)
                 soup = BeautifulSoup(response.text, 'lxml')
-                book = parse_book_page(soup, book_url)
+                book = parse_book_page(soup, link)
                 filename = f'{book["title"]} - {book["author"]}'
                 params = {'id': book_id}
                 download_txt(f'https://tululu.org/txt.php', params, f'{book_id}. {filename}')
                 download_image(book['img url'], book['img name'])
                 if book['comments']:
                     save_comments(book['comments'], f'{book_id}. {filename}')
+                books.append(book)
                 print_info(filename, book['genres'])
                 break
             except requests.HTTPError:
                 print(f'Invalid URL for book {book_id}\n')
                 break
             except requests.exceptions.ConnectionError:
-                print('No internet connection', book_id)
+                print('No internet connection', link)
                 time.sleep(5)
                 continue
+    add_info_to_json(books)
 
 
 if __name__ == '__main__':
     main()
-
