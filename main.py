@@ -15,23 +15,30 @@ def check_for_redirect(response):
         raise requests.HTTPError
 
 
-def download_txt(url, params, filename, folder='books'):
-    os.makedirs(folder, exist_ok=True)
+def download_txt(url, params, filename, path):
     filename = sanitize_filename(filename)
     response = requests.get(url, params=params)
     response.raise_for_status()
+
+    folder = 'books'
+    full_path = os.path.join(path, folder)
+    os.makedirs(full_path, exist_ok=True)
     check_for_redirect(response)
-    filepath = os.path.join(folder, f'{filename}.txt')
+    filepath = os.path.join(full_path, f'{filename}.txt')
     with open(filepath, 'w') as file:
         file.write(response.text)
 
 
-def download_image(url, filename, folder='covers'):
-    os.makedirs(folder, exist_ok=True)
+def download_image(url, filename, path):
     response = requests.get(url)
     response.raise_for_status()
     check_for_redirect(response)
-    filepath = os.path.join(folder, filename)
+
+    folder = 'covers'
+    full_path = os.path.join(path, folder)
+    os.makedirs(full_path, exist_ok=True)
+    filepath = os.path.join(full_path, filename)
+    print(filepath)
     with open(filepath, 'wb') as file:
         file.write(response.content)
 
@@ -74,15 +81,17 @@ def parse_book_page(soup, book_url):
     return book
 
 
-def add_info_to_json(books):
-    with open('books.json', 'w', encoding='utf8') as file:
+def add_info_to_json(books, path):
+    filepath = os.path.join(path, 'books.json')
+    with open(filepath, 'w', encoding='utf8') as file:
         json.dump(books, file, sort_keys=True, indent=4, ensure_ascii=False)
 
 
 def main():
     parser = argparse.ArgumentParser(description='Download books from tululu.org')
-    parser.add_argument('-s', '--start_page', help='id of the first book you want to download', type=int, default=1)
-    parser.add_argument('-e', '--end_page', help='id of the last book you want to download', type=int, default=1)
+    parser.add_argument('-s', '--start_page', help='id of the first book you want to download.', type=int, default=1)
+    parser.add_argument('-e', '--end_page', help='id of the last book you want to download.', type=int, default=1)
+    parser.add_argument('-d', '--dest_folder', help='the path to the directory with the parsing results: pictures, books, JSON.')
     args = parser.parse_args()
     book_links = parse_tululu_category.parse_pages(start_page=args.start_page, end_page=args.end_page)
     books = []
@@ -97,8 +106,8 @@ def main():
                 book = parse_book_page(soup, link)
                 filename = f'{book["title"]} - {book["author"]}'
                 params = {'id': book_id}
-                download_txt(f'https://tululu.org/txt.php', params, f'{book_id}. {filename}')
-                download_image(book['img url'], book['img name'])
+                download_txt(f'https://tululu.org/txt.php', params, f'{book_id}. {filename}', args.dest_folder if args.dest_folder else os.getcwd())
+                download_image(book['img url'], book['img name'], args.dest_folder if args.dest_folder else os.getcwd())
                 books.append(book)
                 print_info(filename, book['genres'])
                 break
@@ -109,7 +118,7 @@ def main():
                 print('No internet connection', link)
                 time.sleep(5)
                 continue
-    add_info_to_json(books)
+    add_info_to_json(books, args.dest_folder if args.dest_folder else os.getcwd())
 
 
 if __name__ == '__main__':
