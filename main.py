@@ -66,7 +66,7 @@ def download_image(url, filename, path):
         file.write(response.content)
 
 
-def print_info(header, genres):
+def print_header_and_genres(header, genres):
     print('Заголовок:', header)
     print('Жанры:', genres)
     print()
@@ -104,7 +104,7 @@ def parse_book_page(soup, book_url):
     return book
 
 
-def add_info_to_json(books, path):
+def add_to_json(books, path):
     filepath = os.path.join(path, 'books.json')
     with open(filepath, 'w', encoding='utf8') as file:
         json.dump(books, file, sort_keys=True, indent=4, ensure_ascii=False)
@@ -137,7 +137,7 @@ def main():
                 if not args.skip_imgs:
                     download_image(book['img url'], book['img name'], path)
                 books.append(book)
-                print_info(filename, book['genres'])
+                print_header_and_genres(filename, book['genres'])
                 break
             except requests.HTTPError:
                 print(f'Invalid URL for book {book_id}\n')
@@ -146,7 +146,7 @@ def main():
                 print('No internet connection', link)
                 time.sleep(5)
                 continue
-    add_info_to_json(books, path)
+    add_to_json(books, path)
 
 
 if __name__ == '__main__':
