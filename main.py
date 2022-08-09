@@ -32,6 +32,9 @@ def parse_pages(*, end_page, start_page=1):
                 print('No internet connection')
                 time.sleep(5)
                 continue
+            except requests.HTTPError:
+                print(f'Invalid URL')
+                break
     return links
 
 
