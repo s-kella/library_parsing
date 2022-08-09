@@ -116,6 +116,7 @@ def main():
     args = parser.parse_args()
     book_links = parse_pages(start_page=args.start_page, end_page=args.end_page)
     books = []
+    path = args.dest_folder if args.dest_folder else os.getcwd()
     for link in book_links:
         book_id = link.split('/b')[-1].strip('/')
         while True:
@@ -128,9 +129,9 @@ def main():
                 filename = f'{book["title"]} - {book["author"]}'
                 params = {'id': book_id}
                 if not args.skip_txt:
-                    download_txt(f'https://tululu.org/txt.php', params, f'{book_id}. {filename}', args.dest_folder if args.dest_folder else os.getcwd())
+                    download_txt(f'https://tululu.org/txt.php', params, f'{book_id}. {filename}', path)
                 if not args.skip_imgs:
-                    download_image(book['img url'], book['img name'], args.dest_folder if args.dest_folder else os.getcwd())
+                    download_image(book['img url'], book['img name'], path)
                 books.append(book)
                 print_info(filename, book['genres'])
                 break
@@ -141,7 +142,7 @@ def main():
                 print('No internet connection', link)
                 time.sleep(5)
                 continue
-    add_info_to_json(books, args.dest_folder if args.dest_folder else os.getcwd())
+    add_info_to_json(books, path)
 
 
 if __name__ == '__main__':
