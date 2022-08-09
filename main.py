@@ -22,6 +22,7 @@ def parse_pages(*, end_page, start_page=1):
                 url = f'https://tululu.org/l55/{page_number}/'
                 response = requests.get(url)
                 response.raise_for_status()
+                check_for_redirect(response)
                 soup = BeautifulSoup(response.text, 'lxml')
                 books = soup.find_all('table', class_='d_book')
                 for book in books:
