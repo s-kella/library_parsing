@@ -104,7 +104,7 @@ def parse_book_page(soup, book_url):
     return book
 
 
-def add_to_json(books, path):
+def save_to_json(books, path):
     filepath = os.path.join(path, 'books.json')
     with open(filepath, 'w', encoding='utf8') as file:
         json.dump(books, file, sort_keys=True, indent=4, ensure_ascii=False)
@@ -146,7 +146,7 @@ def main():
                 print('No internet connection', link)
                 time.sleep(5)
                 continue
-    add_to_json(books, path)
+    save_to_json(books, path)
 
 
 if __name__ == '__main__':
