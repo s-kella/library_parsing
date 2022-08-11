@@ -114,13 +114,12 @@ def main():
     parser = argparse.ArgumentParser(description='Download books from tululu.org')
     parser.add_argument('-s', '--start_page', help='first page you want to download.', type=int, default=1)
     parser.add_argument('-e', '--end_page', help='last page you want to download.', type=int, default=1)
-    parser.add_argument('-d', '--dest_folder', help='the path to the directory with the parsing results: pictures, books, JSON.')
+    parser.add_argument('-d', '--dest_folder', help='the path to the directory with the parsing results: pictures, books, JSON.', default=os.getcwd())
     parser.add_argument('-si', '--skip_imgs', help='do not download images', action='store_true')
     parser.add_argument('-st', '--skip_txt', help='do not download books', action='store_true')
     args = parser.parse_args()
     book_links = parse_pages(start_page=args.start_page, end_page=args.end_page)
     books = []
-    path = args.dest_folder if args.dest_folder else os.getcwd()
     for link in book_links:
         book_id = link.split('/b')[-1].strip('/')
         while True:
@@ -133,9 +132,9 @@ def main():
                 filename = f'{book["title"]} - {book["author"]}'
                 params = {'id': book_id}
                 if not args.skip_txt:
-                    download_txt(f'https://tululu.org/txt.php', params, f'{book_id}. {filename}', path)
+                    download_txt(f'https://tululu.org/txt.php', params, f'{book_id}. {filename}', args.dest_folder)
                 if not args.skip_imgs:
-                    download_image(book['img url'], book['img name'], path)
+                    download_image(book['img url'], book['img name'], args.dest_folder)
                 books.append(book)
                 print_header_and_genres(filename, book['genres'])
                 break
@@ -146,7 +145,7 @@ def main():
                 print('No internet connection', link)
                 time.sleep(5)
                 continue
-    save_to_json(books, path)
+    save_to_json(books, args.dest_folder)
 
 
 if __name__ == '__main__':
