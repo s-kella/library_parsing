@@ -14,14 +14,14 @@ with open("books.json", "r", encoding="utf8") as books_file:
     books = books_file.read()
 books = json.loads(books)
 
-authors_n_names = []
+books_for_rendering = []
 for book in books:
-    authors_n_names.append({'author': book['author'],
+    books_for_rendering.append({'author': book['author'],
                             'title': book['title'],
                             'pic' : os.path.join('covers', book['img name'])})
 
 rendered_page = template.render(
-    authors_n_names=authors_n_names,
+    authors_n_names=books_for_rendering,
 )
 
 with open('index.html', 'w', encoding="utf8") as books_file:
