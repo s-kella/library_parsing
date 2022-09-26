@@ -129,14 +129,15 @@ def main():
                 check_for_redirect(response)
                 soup = BeautifulSoup(response.text, 'lxml')
                 book = parse_book_page(soup, link)
-                filename = f'{book["title"]} - {book["author"]}'
+                filename = f'{book_id}. {book["title"]} - {book["author"]}'
+                book['filename'] = filename
                 params = {'id': book_id}
                 if not args.skip_txt:
-                    download_txt(f'https://tululu.org/txt.php', params, f'{book_id}. {filename}', args.dest_folder)
+                    download_txt(f'https://tululu.org/txt.php', params, filename, args.dest_folder)
                 if not args.skip_imgs:
                     download_image(book['img url'], book['img name'], args.dest_folder)
                 books.append(book)
-                print_header_and_genres(filename, book['genres'])
+                print_header_and_genres(f'{book["title"]} - {book["author"]}', book['genres'])
                 break
             except requests.HTTPError:
                 print(f'Invalid URL for book {book_id}\n')
