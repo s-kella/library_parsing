@@ -11,6 +11,47 @@
     <title>My library</title>
   </head>
       <body>
+        <div class="mx-auto" style="width: 200px;">
+            <nav aria-label="...">
+              <ul class="pagination">
+                {%if cur_page == 0%}
+                    <li class="page-item disabled">
+                      <a class="page-link" href="index{{cur_page-1}}.html" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                      </a>
+                    </li>
+                {% else %}
+                  <li class="page-item">
+                      <a class="page-link" href="index{{cur_page-1}}.html" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                      </a>
+                  </li>
+                {% endif %}
+                {% for page in range(cur_page) %}
+                    <li class="page-item"><a class="page-link" href="index{{page}}.html">{{page+1}}</a></li>
+                {% endfor %}
+                    <li class="page-item active" aria-current="page">
+                        <a class="page-link" href="index{{cur_page}}.html">{{cur_page+1}} <span class="sr-only">(current)</span></a>
+                    </li>
+                {% for page in range(cur_page+1, pages) %}
+                    <li class="page-item"><a class="page-link" href="index{{page}}.html">{{page+1}}</a></li>
+                {% endfor %}
+                {%if cur_page == pages-1%}
+                    <li class="page-item disabled">
+                      <a class="page-link" href="index{{cur_page+1}}.html" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                      </a>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                      <a class="page-link" href="index{{cur_page+1}}.html" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                      </a>
+                    </li>
+                {% endif %}
+              </ul>
+            </nav>
+        </div>
         <div class="container">
             <div class="row">
                 {% for column in books %}
