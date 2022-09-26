@@ -24,7 +24,7 @@
                               <div class="card-body">
                                 <h5 class="card-title">{{book.title}}</h5>
                                 <p class="card-text">{{book.author}}</p>
-                                <a href="#" class="btn btn-primary">BUTTON</a>
+                                <a href="{{book.path|urlencode}}" class="btn btn-primary" target="_blank">Читать</a>
                               </div>
                             </div>
                           </div>

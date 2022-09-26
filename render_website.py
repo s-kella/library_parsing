@@ -25,7 +25,8 @@ books_for_rendering = []
 for book in books:
     books_for_rendering.append({'author': book['author'],
                                 'title': book['title'],
-                                'pic': os.path.join('covers', book['img name'])})
+                                'pic': os.path.join('covers', book['img name']),
+                                'path': os.path.join('books', f'{book["filename"]}.txt')})
 books_for_rendering = list(chunked(books_for_rendering, 2))
 on_reload()
 
