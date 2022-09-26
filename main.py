@@ -44,9 +44,11 @@ def download_txt(url, params, filename, path):
     response = requests.get(url, params=params)
     response.raise_for_status()
 
-    os.makedirs(path, exist_ok=True)
+    folder = 'books'
+    full_path = os.path.join(path, folder)
+    os.makedirs(full_path, exist_ok=True)
     check_for_redirect(response)
-    filepath = os.path.join(path, f'{filename}.txt')
+    filepath = os.path.join(full_path, f'{filename}.txt')
     with open(filepath, 'w') as file:
         file.write(response.text)
 
@@ -56,8 +58,10 @@ def download_image(url, filename, path):
     response.raise_for_status()
     check_for_redirect(response)
 
-    os.makedirs(path, exist_ok=True)
-    filepath = os.path.join(path, filename)
+    folder = 'covers'
+    full_path = os.path.join(path, folder)
+    os.makedirs(full_path, exist_ok=True)
+    filepath = os.path.join(full_path, filename)
     with open(filepath, 'wb') as file:
         file.write(response.content)
 
@@ -110,7 +114,7 @@ def main():
     parser = argparse.ArgumentParser(description='Download books from tululu.org')
     parser.add_argument('-s', '--start_page', help='first page you want to download.', type=int, default=1)
     parser.add_argument('-e', '--end_page', help='last page you want to download.', type=int, default=1)
-    parser.add_argument('-d', '--dest_folder', help='path to the directory with the parsing results', default=os.getcwd())
+    parser.add_argument('-d', '--dest_folder', help='the path to the directory with the parsing results: pictures, books, JSON.', default=os.getcwd())
     parser.add_argument('-si', '--skip_imgs', help='do not download images', action='store_true')
     parser.add_argument('-st', '--skip_txt', help='do not download books', action='store_true')
     args = parser.parse_args()
@@ -126,12 +130,12 @@ def main():
                 soup = BeautifulSoup(response.text, 'lxml')
                 book = parse_book_page(soup, link)
                 filename = f'{book_id}. {book["title"]} - {book["author"]}'
-                book['filename'] = os.path.join(args.dest_folder, 'books', f'{filename}.txt')
+                book['filename'] = filename
                 params = {'id': book_id}
                 if not args.skip_txt:
-                    download_txt(f'https://tululu.org/txt.php', params, filename, path=os.path.join(args.dest_folder, 'books'))
+                    download_txt(f'https://tululu.org/txt.php', params, filename, args.dest_folder)
                 if not args.skip_imgs:
-                    download_image(book['img url'], book['img name'], path=os.path.join(args.dest_folder, 'covers'))
+                    download_image(book['img url'], book['img name'], args.dest_folder)
                 books.append(book)
                 print_header_and_genres(f'{book["title"]} - {book["author"]}', book['genres'])
                 break
