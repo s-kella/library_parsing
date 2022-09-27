@@ -8,7 +8,7 @@ from more_itertools import chunked
 def on_reload():
     for i, page in enumerate(books_for_rendering):
         books = list(chunked(page, 2))
-        rendered_page = template.render(books=books)
+        rendered_page = template.render(books=books, cur_page=i, pages=len(books_for_rendering))
         page_path = os.path.join('pages', f'index{i}.html')
         with open(page_path, 'w', encoding="utf8") as file:
             file.write(rendered_page)
@@ -28,6 +28,7 @@ for book in books:
     books_for_rendering.append({'author': book['author'],
                                 'title': book['title'],
                                 'pic': os.path.join('../covers', book['img name']),
+                                'genres': book['genres'].split(', '),
                                 'path': os.path.join('../books', f'{book["filename"]}.txt')})
 books_for_rendering = list(chunked(books_for_rendering, 10))
 on_reload()
