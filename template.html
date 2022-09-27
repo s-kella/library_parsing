@@ -11,7 +11,7 @@
     <title>My library</title>
   </head>
       <body>
-        <div class="mx-auto" style="width: 200px;">
+        <div class="mt-3 mx-auto" style="width: 200px;">
             <nav aria-label="...">
               <ul class="pagination">
                 {%if cur_page == 0%}
@@ -65,6 +65,9 @@
                               <div class="card-body">
                                 <h5 class="card-title">{{book.title}}</h5>
                                 <p class="card-text">{{book.author}}</p>
+                                {% for genre in book.genres %}
+                                    <span class="badge badge-light">{{genre}}</span>
+                                {% endfor %}<br>
                                 <a href="{{book.path|urlencode}}" class="btn btn-primary" target="_blank">Читать</a>
                               </div>
                             </div>
