@@ -6,6 +6,7 @@ from more_itertools import chunked
 
 
 def on_reload():
+    template = env.get_template('template.html')
     for i, page in enumerate(books_for_rendering):
         books = list(chunked(page, 2))
         rendered_page = template.render(books=books, cur_page=i, pages=len(books_for_rendering))
@@ -18,7 +19,7 @@ os.makedirs('pages', exist_ok=True)
 env = Environment(
     loader=FileSystemLoader('.'),
     autoescape=select_autoescape(['html', 'xml']))
-template = env.get_template('template.html')
+
 
 with open("books.json", "r", encoding="utf8") as books_file:
     books = books_file.read()
