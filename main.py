@@ -40,7 +40,6 @@ def parse_pages(*, end_page, start_page=1):
 
 
 def download_txt(url, params, filename, path):
-    filename = sanitize_filename(filename)
     response = requests.get(url, params=params)
     response.raise_for_status()
 
@@ -130,6 +129,7 @@ def main():
                 soup = BeautifulSoup(response.text, 'lxml')
                 book = parse_book_page(soup, link)
                 filename = f'{book_id}. {book["title"]} - {book["author"]}'
+                filename = sanitize_filename(filename)
                 book['filename'] = filename
                 params = {'id': book_id}
                 if not args.skip_txt:
