@@ -28,9 +28,9 @@ books_for_rendering = []
 for book in books:
     books_for_rendering.append({'author': book['author'],
                                 'title': book['title'],
-                                'pic': os.path.join('../covers', book['img name']),
+                                'pic':f'../covers/{book["img name"]}',
                                 'genres': book['genres'].split(', '),
-                                'path': os.path.normpath(os.path.join('../books', f'{book["filename"]}.txt'))
+                                'path': f'../books/{book["filename"]}.txt'
                                 })
 books_for_rendering = list(chunked(books_for_rendering, 10))
 on_reload()
