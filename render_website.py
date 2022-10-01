@@ -5,12 +5,7 @@ from livereload import Server
 from more_itertools import chunked
 
 
-env = Environment(
-        loader=FileSystemLoader('.'),
-        autoescape=select_autoescape(['html', 'xml']))
-
-
-def on_reload(books_for_rendering):
+def on_reload():
     template = env.get_template('template.html')
     for i, page in enumerate(books_for_rendering):
         books = list(chunked(page, 2))
@@ -20,26 +15,24 @@ def on_reload(books_for_rendering):
             file.write(rendered_page)
 
 
-def make_a_site():
-    os.makedirs('pages', exist_ok=True)
-    with open("books.json", "r", encoding="utf8") as books_file:
-        books = books_file.read()
-    books = json.loads(books)
-    books_for_rendering = []
-    for book in books:
-        books_for_rendering.append({'author': book['author'],
-                                    'title': book['title'],
-                                    'pic': f'../covers/{book["img name"]}',
-                                    'genres': book['genres'].split(', '),
-                                    'path': f'../books/{book["filename"]}.txt'
-                                    })
-    books_for_rendering = list(chunked(books_for_rendering, 10))
-    on_reload(books_for_rendering)
+os.makedirs('pages', exist_ok=True)
+env = Environment(
+    loader=FileSystemLoader('.'),
+    autoescape=select_autoescape(['html', 'xml']))
 
 
-if __name__ == '__main__':
-    make_a_site()
-    server = Server()
-    server.watch('template.html', on_reload)
-    server.serve(root='.')
+with open("books.json", "r", encoding="utf8") as books_file:
+    books = books_file.read()
+books = json.loads(books)
+books_for_rendering = [{'author': book['author'],
+                        'title': book['title'],
+                        'pic': f'../covers/{book["img name"]}',
+                        'genres': book['genres'].split(', '),
+                        'path': f'../books/{book["filename"]}.txt'}
+                       for book in books]
+books_for_rendering = list(chunked(books_for_rendering, 10))
+on_reload()
 
+server = Server()
+server.watch('template.html', on_reload)
+server.serve(root='.')
