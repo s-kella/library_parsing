@@ -2,7 +2,7 @@
 
 The program downloads books from the online-library [tululu.org](https://tululu.org/) and create a website with books. <br />
 * `main.py` downloads books and creates a file a with descriptions of the all downloaded books (title, author, genres, user comments from tululu.org). <br />
-* `render_website.py` creates a website using this file. <br /> <br />
+* `render_website.py` creates a website using this file.
 ###
 Example of a [website](https://s-kella.github.io/library_parsing/pages/index0.html) on GitHub Pages.
 
