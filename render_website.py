@@ -22,8 +22,7 @@ env = Environment(
 
 
 with open("books.json", "r", encoding="utf8") as books_file:
-    books = books_file.read()
-books = json.loads(books)
+    books = json.load(books_file)
 books_for_rendering = [{'author': book['author'],
                         'title': book['title'],
                         'pic': f'../covers/{book["img name"]}',
