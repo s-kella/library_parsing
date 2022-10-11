@@ -48,7 +48,7 @@ def download_txt(url, params, filename, path):
     os.makedirs(full_path, exist_ok=True)
     check_for_redirect(response)
     filepath = os.path.join(full_path, f'{filename}.txt')
-    with open(filepath, 'w', encoding='windows-1251') as file:
+    with open(filepath, 'w', encoding='utf-8') as file:
         file.write(response.text)
 
 
